@@ -1,11 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'
+import * as yup from 'yup';
+import { Link, useHistory } from 'react-router-dom'
 import { Field, Formik, Form, ErrorMessage } from "formik"
 
 import { Post, Get, Put } from "../../../utils/axiosUtils";
 
-export const AddEditEmployee = ({ history, match }) => {
+export const AddEditEmployee = ({ match }) => {
+    const history = useHistory();
+
     const { id } = match.params;
     const isAddMode = !id;
 
@@ -16,6 +19,14 @@ export const AddEditEmployee = ({ history, match }) => {
         designation: "",
         experiance: "",
     })
+
+    const validationSchema = yup.object().shape({
+        first_name: yup.string().required("First Name is required"),
+        last_name: yup.string().required("Last Name is required"),
+        designation: yup.string().required("Designation  is required"),
+        experiance: yup.number().required("Experiance is required").positive().integer(),
+
+    });
 
     const onSubmit = (field, { setSubmitting }) => {
         if (isAddMode) {
@@ -28,30 +39,32 @@ export const AddEditEmployee = ({ history, match }) => {
     }
 
 
-    const addEmployee = (fields, setSubmitting) => {
+    const addEmployee = async (fields, setSubmitting) => {
         const postData = {
             ...fields
         }
 
-        Post("/employee", postData).than((res) => {
-            console.log(res);
-            // setSubmitting(false)
-        })
+        const res = await Post("/employee", postData)
+        if (res.data) {
+            history.push("/");
+        }
     }
 
-    const editEmployee = (fields, setSubmitting) => {
+    const editEmployee = async (fields, setSubmitting) => {
         const postData = {
             ...fields
         }
 
-        Put(`/employee/${id}`, postData).than((res) => {
-            console.log(res);
-            // setSubmitting(false)
-        })
+        const res = await Put(`/employee/${id}`, postData)
+
+        if (res.data) {
+            history.push("/");
+        }
     }
+
     const getEmployeeyById = async () => {
         const res = await Get(`/employee/${id}`);
-        console.log(res.data);
+
         if (res.data) {
             setInitVals((prev) => {
                 return {
@@ -61,8 +74,6 @@ export const AddEditEmployee = ({ history, match }) => {
             })
         }
     }
-    // return data;
-
 
     useEffect(() => {
         if (!isAddMode) {
@@ -82,7 +93,7 @@ export const AddEditEmployee = ({ history, match }) => {
             <Formik
                 enableReinitialize={true}
                 initialValues={initVals}
-                validationSchema={false}
+                validationSchema={validationSchema}
                 onSubmit={onSubmit}
             >
                 {({
@@ -117,11 +128,16 @@ export const AddEditEmployee = ({ history, match }) => {
                                         <Field name="experiance" type="text" className={'form-control' + (errors.experiance && touched.experiance ? ' is-invalid' : '')} />
                                         <ErrorMessage name="experiance" component="div" className="invalid-feedback" />
                                     </div>
+                                    <div className="form-group col-md-6">
+                                        <label>Pic</label>
+                                        <Field name="avatar" type="text" className={'form-control' + (errors.avatar && touched.avatar ? ' is-invalid' : '')} />
+                                        <ErrorMessage name="avatar" component="div" className="invalid-feedback" />
+                                    </div>
                                 </div>
                                 <div className="form-group mt-2">
                                     <button type="submit" disabled={isSubmitting} className="btn btn-primary">
                                         {/* {isSubmitting && <span className="spinner-border spinner-border-sm mr-1"></span>} */}
-                                        Save
+                                        {isAddMode ? "Save" : "Update"}
                                     </button>
                                     <Link to={isAddMode ? '.' : '..'} className="btn btn-link">Cancel</Link>
                                 </div>
