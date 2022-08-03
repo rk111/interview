@@ -1,0 +1,29 @@
+{
+    "employee" : [
+        {
+            "id" :1,
+            "first_name": "Ravi",
+            "last_name": "Kant",
+            "dob": "28-jul-2000",
+            "designation": "UI",
+            "experience": 12
+        },
+        {
+            "id" :2,
+            "first_name": "Ram",
+            "last_name": "Kant",
+            "dob": "29-jul-2001",
+            "designation": "Backend",
+            "experience": 12
+        },
+        {
+            "id" :3,
+            "first_name": "Jhone",
+            "last_name": "Deo",
+            "dob": "01-apr-1992",
+            "designation": "Backend",
+            "experience": 12
+        }
+
+    ]
+}
